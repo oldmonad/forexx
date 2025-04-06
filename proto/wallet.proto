@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package wallet;
+
+// import "google/protobuf/timestamp.proto";
+
+// Enum for allowed currencies.
+enum GRPCCurrency {
+  CURRENCY_UNSPECIFIED = 0;
+  NGN = 1;
+  USD = 2;
+}
+
+enum UpdateType {
+  UPDATE_TYPE_UNSPECIFIED = 0;
+  DEPOSIT = 1;
+  WITHDRAWAL = 2;
+}
+
+// Message representing a Wallet.
+message Wallet {
+  string id = 1;
+  string userId = 2;
+  double balance = 3;
+  GRPCCurrency currency = 4;
+  // google.protobuf.Timestamp createdAt = 5;
+  // google.protobuf.Timestamp updatedAt = 6;
+}
+
+// Service definition for Wallet operations.
+service WalletService {
+  rpc GetWallet(GetWalletRequest) returns (Wallet);
+  rpc GetWalletByCurrency(GetWalletRequestByCurrency) returns (Wallet);
+  rpc UpdateWallet(UpdateWalletRequest) returns (Wallet);
+}
+
+// Request message for fetching a wallet.
+message GetWalletRequest {
+  string userId = 1;
+}
+
+// Request message for fetching a wallet.
+message GetWalletRequestByCurrency {
+  string userId = 1;
+  GRPCCurrency currency = 2;
+}
+
+// Request message for updating a wallet.
+message UpdateWalletRequest {
+  string walletId = 1;
+  string userId = 2;
+  UpdateType updateType = 3;
+  double amount = 4;
+}

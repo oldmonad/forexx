@@ -1,16 +1,82 @@
 services:
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
+  authentication:
+    build:
+      context: .
+      args:
+        SERVICE: authentication
     ports:
-      - 5672:5672
-      - 15672:15672
-    volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-    networks:
-      - rabbitmq_go_net
+      - '3000:3000'
+    env_file: .env.docker
+    depends_on:
+      - postgres
+      - rabbitmq
 
-networks:
-  rabbitmq_go_net:
-    driver: bridge
+  wallet:
+    build:
+      context: .
+      args:
+        SERVICE: wallet
+    ports:
+      - '3001:3001' # HTTP
+      - '5000:5000' # GRPC
+    env_file: .env.docker
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  order:
+    build:
+      context: .
+      args:
+        SERVICE: order
+    ports:
+      - '3003:3003'
+    env_file: .env.docker
+    depends_on:
+      - postgres
+
+  notification:
+    build:
+      context: .
+      args:
+        SERVICE: notification
+    ports:
+      - '3004:3004'
+    env_file: .env.docker
+    depends_on:
+      - postgres
+
+  rate:
+    build:
+      context: .
+      args:
+        SERVICE: rate
+    ports:
+      - '3005:3005' # HTTP
+      - '5001:5001' # GRPC
+    env_file: .env.docker
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 'Monchi9999'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+volumes:
+  pgdata:

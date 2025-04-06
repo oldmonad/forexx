@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package exchangerate;
+
+service ExchangeRateService {
+  rpc GetExchangeRates (ExchangeRateRequest) returns (ExchangeRateResponse);
+}
+
+message ExchangeRateRequest {
+  string baseCode = 1;
+}
+
+message ExchangeRateResponse {
+  string result = 1;
+  string documentation = 2;
+  string termsOfUse = 3;
+  int64 timeLastUpdateUnix = 4;
+  string timeLastUpdate_utc = 5;
+  int64 timeNextUpdateUnix = 6;
+  string timeNextUpdateUtc = 7;
+  string baseCode = 8;
+  map<string, double> conversionRates = 9;
+}
